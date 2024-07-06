@@ -53,7 +53,10 @@ def add_student(lastName, firstName, email):
 
 def add_section(course_abbreviation, courseNumber, sectionNumber, semester, sectionYear, building, room, schedule, startTime, instructor):
     try:
-        course = Course.objects(department__abbreviation=course_abbreviation, courseNumber=courseNumber).first()
+        department = Department.objects(abbreviation=course_abbreviation).first()
+        if not department:
+            raise ValueError('Department not found')
+        course = Course.objects(department=department, courseNumber=courseNumber).first()
         if not course:
             raise ValueError('Course not found')
         section = Section(course=course, sectionNumber=sectionNumber, semester=semester, sectionYear=sectionYear, building=building, room=room, schedule=schedule, startTime=startTime, instructor=instructor)
@@ -63,18 +66,26 @@ def add_section(course_abbreviation, courseNumber, sectionNumber, semester, sect
         print(f'Error: A section with the number "{sectionNumber}" for course "{course_abbreviation} {courseNumber}" in semester "{semester} {sectionYear}" already exists.')
     except (db.ValidationError, ValueError) as e:
         print(f'Error adding section: {e}')
-
+        
 def add_enrollment(student_email, course_abbreviation, courseNumber, sectionNumber, semester, sectionYear, category):
     try:
         student = Student.objects(email=student_email).first()
-        section = Section.objects(course__department__abbreviation=course_abbreviation, course__courseNumber=courseNumber, sectionNumber=sectionNumber, semester=semester, sectionYear=sectionYear).first()
-        if not student or not section:
-            raise ValueError('Student or Section not found')
+        if not student:
+            raise ValueError('Student not found')
+        department = Department.objects(abbreviation=course_abbreviation).first()
+        if not department:
+            raise ValueError('Department not found') 
+        course = Course.objects(department=department, courseNumber=courseNumber).first()
+        if not course:
+            raise ValueError('Course not found') 
+        section = Section.objects(course=course, sectionNumber=sectionNumber, semester=semester, sectionYear=sectionYear).first()
+        if not section:
+            raise ValueError('Section not found')
         enrollment = Enrollment(student=student, section=section, category=category)
         enrollment.save()
         print(f'Enrollment added: {enrollment}')
     except db.errors.NotUniqueError:
-        print(f'Error: The student "{student_email}" is already enrolled in the section "{course_abbreviation} {courseNumber} Section {sectionNumber} ({semester} {sectionYear})".')
+        print(f'Error: The student with this email "{student_email}" is already enrolled in the section "{course_abbreviation} {courseNumber} Section {sectionNumber} ({semester} {sectionYear})".')
     except (db.ValidationError, ValueError) as e:
         print(f'Error adding enrollment: {e}')
 
@@ -88,6 +99,6 @@ def add_student_major(student_email, major_name):
         student_major.save()
         print(f'StudentMajor added: {student_major}')
     except db.errors.NotUniqueError:
-        print(f'Error: The student "{student_email}" has already declared the major "{major_name}".')
+        print(f'Error: The student with this "{student_email}" has already declared the major "{major_name}".')
     except (db.ValidationError, ValueError) as e:
         print(f'Error adding student major: {e}')

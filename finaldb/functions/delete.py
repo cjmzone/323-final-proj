@@ -18,7 +18,10 @@ def delete_department(abbreviation):
 
 def delete_course(department_abbreviation, courseNumber):
     try:
-        course = Course.objects(department__abbreviation=department_abbreviation, courseNumber=courseNumber).first()
+        department = Department.objects(abbreviation=department_abbreviation).first()
+        if not department:
+            raise ValueError('Department not found')
+        course = Course.objects(department=department, courseNumber=courseNumber).first()
         if not course:
             raise ValueError('Course not found')
         course.delete()

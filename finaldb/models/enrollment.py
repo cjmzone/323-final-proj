@@ -1,7 +1,7 @@
 import mongoengine as db
 from .student import Student
 from .section import Section
-
+"""this is enrollment"""
 class Enrollment(db.Document):
     student = db.ReferenceField(Student, reverse_delete_rule=db.CASCADE)
     section = db.ReferenceField(Section, reverse_delete_rule=db.CASCADE)
