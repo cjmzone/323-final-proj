@@ -5,7 +5,8 @@ from functions.list import list_departments, list_courses, list_sections, list_e
 from functions.delete import delete_department, delete_course, delete_student, delete_section, delete_enrollment, delete_student_major
 from functions.update import update_department_abbreviation, update_course_name, update_student_name
 # Establish connection to MongoDB
-me.connect(db='school', host='mongodb+srv://panicman90:XLxEqY2cNz2dx4VV@cluster0.smx3y87.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0')
+
+me.connect(db='school', host='mongodb+srv://cjmzone:wireWar21$@cecs323.dp4wxsa.mongodb.net/?retryWrites=true&w=majority&appName=cecs323')
 
 def add_menu():
     while True:
